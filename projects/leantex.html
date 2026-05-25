@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width,initial-scale=1"/>
+	<title>LeanTeX · Harrison Mesh</title>
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+	<style>
+:root{--bg:#101114;--panel:#f3eee2;--ink:#161616;--soft:#d6cec0;--green:#45d483;--blue:#57b8ff;--orange:#ffb13d;--pink:#ff6b9a;--purple:#a98cff;--shadow:10px 10px 0 rgba(0,0,0,.28)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 10% 10%,rgba(69,212,131,.14),transparent 30%),var(--bg);color:var(--panel);font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif}
+a{color:inherit}
+.wrap{width:min(980px,calc(100% - 36px));margin:0 auto;padding:28px 0 60px}
+header{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:22px 0}
+.logo{font-weight:950;font-size:24px;letter-spacing:-.055em;text-decoration:none}
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.nav a{border:2px solid var(--panel);padding:9px 11px;text-decoration:none;font-weight:900}
+.hero{padding:44px 0}
+h1{font-size:clamp(42px,8vw,86px);line-height:.88;letter-spacing:-.085em;margin:0 0 18px}
+.lead{font-size:20px;line-height:1.5;color:var(--soft);max-width:760px}
+.panel{background:var(--panel);color:var(--ink);border:3px solid var(--panel);box-shadow:var(--shadow);padding:24px;margin:18px 0}
+.tag{display:inline-block;background:var(--green);border:2px solid var(--ink);padding:6px 8px;font-weight:950;font-size:12px;margin-bottom:12px}
+.panel.blue .tag{background:var(--blue)}.panel.orange .tag{background:var(--orange)}.panel.purple .tag{background:var(--purple)}
+h2{font-size:34px;letter-spacing:-.06em;margin:0 0 10px}
+p,li{line-height:1.6}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.tile{background:rgba(243,238,226,.08);border:2px solid rgba(243,238,226,.5);padding:14px;font-weight:900}
+@media(max-width:780px){.grid{grid-template-columns:1fr}}
+	</style>
+</head>
+<body>
+	<div class="wrap">
+		<header>
+			<a class="logo" href="../index.html">harrisonmesh.com</a>
+			<nav class="nav">
+				<a href="../index.html#about">about</a>
+				<a href="../index.html#experience">experience</a>
+				<a href="../index.html#projects">projects</a>
+				<a href="../index.html#blog">blog</a>
+			</nav>
+		</header>
+		<main>
+			<section class="hero"><h1>LeanTeX</h1></section>
+			<section class="panel purple">
+				<h2>Core idea</h2>
+				<p>LeanTeX analyzes proof structure and translates it into an intermediate representation resembling tactic mode, making it easier to produce structured mathematical explanations. It is a tool that converts Lean 4 programs into LaTeX documents.</p>
+			</section>
+			<section class="panel">
+				<h2>Current scope</h2>
+				<p>The current methodology starts with propositional logic and is designed to extend to richer proof systems. A team effort alongside my brother <a href="https://loganmesh.com">Logan</a>.</p>
+			</section>
+			<section class="panel blue">
+				<h2>Links</h2>
+				<p><a href="https://github.com/lmesh91/LeanTeX">GitHub repository</a></p>
+			</section>
+		</main>
+	</div>
+</body>
+</html>

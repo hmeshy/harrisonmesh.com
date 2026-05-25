@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Harrison Mesh</title>
+  <meta name="description" content="Harrison Mesh — computer science, mathematics, chess engines, polyomino tiling, and formal methods." />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --bg:#101114;
+  --panel:#f3eee2;
+  --ink:#161616;
+  --muted:#676056;
+  --soft:#d6cec0;
+  --line:#161616;
+  --white:#fffaf0;
+  --black:#1e2624;
+  --green:#45d483;
+  --blue:#57b8ff;
+  --orange:#ffb13d;
+  --pink:#ff6b9a;
+  --purple:#a98cff;
+  --shadow:10px 10px 0 rgba(0,0,0,.28);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255,255,255,.03), transparent 18%),
+    radial-gradient(circle at 8% 22%, rgba(255,107,154,.07), transparent 24%),
+    radial-gradient(circle at 14% 10%, rgba(69,212,131,.14), transparent 30%),
+    radial-gradient(circle at 86% 16%, rgba(87,184,255,.12), transparent 28%),
+    radial-gradient(circle at 45% 95%, rgba(255,177,61,.10), transparent 34%),
+    repeating-linear-gradient(135deg, rgba(255,255,255,.018) 0 1px, transparent 1px 16px),
+    var(--bg);
+  color:var(--panel);
+}
+a{color:inherit}
+header{
+  padding:22px clamp(18px,4vw,54px);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+  border-bottom:1px solid rgba(243,238,226,.16);
+  position:sticky;
+  top:0;
+  z-index:4;
+  background:rgba(16,17,20,.9);
+  backdrop-filter:blur(10px);
+}
+.logo{
+  font-weight:950;
+  letter-spacing:-.055em;
+  font-size:25px;
+  text-decoration:none;
+}
+nav{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+nav a,.button{
+  text-decoration:none;
+  border:2px solid var(--panel);
+  padding:9px 11px;
+  font-weight:900;
+  box-shadow:4px 4px 0 rgba(243,238,226,.2);
+  background:transparent;
+  color:var(--panel);
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+}
+nav a:hover,.button:hover{background:rgba(243,238,226,.12)}
+.button.primary{background:var(--orange);color:var(--ink);border-color:var(--orange)}
+section{padding:42px clamp(18px,5vw,72px)}
+.about{
+  display:grid;
+  grid-template-columns:minmax(0,.95fr) minmax(360px,1.05fr);
+  gap:34px;
+  align-items:center;
+}
+.kicker{color:var(--green);font-weight:950;letter-spacing:.04em;text-transform:uppercase;margin-bottom:16px}
+h1{margin:0 0 20px;font-size:clamp(50px,8.4vw,108px);line-height:.85;letter-spacing:-.035em}
+h1 span{color:var(--orange)}
+.lead{margin:0;color:var(--soft);line-height:1.48;font-size:clamp(17px,1.8vw,22px);max-width:760px}
+.about-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}
+.profile-card{
+  background:var(--panel);
+  color:var(--ink);
+  border:3px solid var(--panel);
+  box-shadow:var(--shadow);
+  padding:16px;
+  display:grid;
+  grid-template-columns:180px minmax(0,1fr);
+  gap:18px;
+  align-items:center;
+}
+.profile-card img{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  object-position:center 36%;
+  border:3px solid var(--line);
+  background:var(--white);
+}
+.profile-card h2{margin:0 0 10px;font-size:29px;letter-spacing:-.055em;line-height:1}
+.profile-card p{margin:0;color:#413a34;line-height:1.5}
+.profile-facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.profile-fact{border:2px solid var(--line);background:var(--white);padding:9px;min-height:66px}
+.profile-fact strong{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;color:#5d554d}
+.profile-fact span{font-weight:900;line-height:1.2;display:block}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}
+.mini{
+  background:var(--panel);
+  color:var(--ink);
+  border:3px solid var(--panel);
+  box-shadow:var(--shadow);
+  min-height:464px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  text-decoration:none;
+  position:relative;
+  overflow:hidden;
+}
+.mini h3{margin:0 0 12px;font-size:23px;letter-spacing:-.05em}
+.mini p{color:#413a34;line-height:1.45;font-size:14px;margin:14px 0 0}
+.mini .cta{margin-top:auto;font-weight:950;color:var(--ink);padding-top:12px}
+.chess-board{
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(8,1fr);
+  border:2px solid var(--line);
+  isolation:isolate;
+  background:var(--line);
+  max-width:100%;
+}
+.chess-square{
+  aspect-ratio:1;
+  display:grid;
+  place-items:center;
+  font-size:clamp(18px,3.2vw,29px);
+  position:relative;
+  transition:background .16s ease, box-shadow .16s ease;
+}
+.chess-square.light{background:#f3e8cf}
+.chess-square.dark{background:#6f8354}
+.piece{display:grid;place-items:center;line-height:1;transition:opacity .14s ease, transform .18s ease}
+.white-piece{color:#fff8e9;text-shadow:0 1px 0 #111,1px 0 0 #111,0 -1px 0 #111,-1px 0 0 #111}
+.black-piece{color:#141414}
+.chess-square .after{display:none}
+.chess-link:hover .move-from,
+.chess-link:focus-visible .move-from{background:#ffdf72}
+.chess-link:hover .move-to,
+.chess-link:focus-visible .move-to{background:#ffb13d;box-shadow:inset 0 0 0 3px rgba(22,22,22,.55)}
+.chess-link:hover .move-from .before,
+.chess-link:focus-visible .move-from .before,
+.chess-link:hover .move-to .before,
+.chess-link:focus-visible .move-to .before{display:none}
+.chess-link:hover .move-from .after,
+.chess-link:focus-visible .move-from .after,
+.chess-link:hover .move-to .after,
+.chess-link:focus-visible .move-to .after{display:grid;transform:scale(1.12)}
+.move-arrow{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:0;transition:opacity .18s ease}
+.chess-link:hover .move-arrow,
+.chess-link:focus-visible .move-arrow{opacity:1}
+.move-note{display:none}
+.poly-wrap{
+  position:relative;
+  border:3px solid var(--line);
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,.22), transparent 26%),
+    #111;
+  overflow:hidden;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.08), 7px 7px 0 rgba(22,22,22,.18);
+}
+.poly-wrap img{
+  display:block;
+  width:100%;
+  height:auto;
+  transition:transform .18s ease, filter .18s ease;
+}
+.poly-link:hover .poly-wrap img,
+.poly-link:focus-visible .poly-wrap img{transform:scale(1.015);filter:saturate(1.08) contrast(1.03)}
+.poly-cover{
+  position:absolute;
+  left:37.5%;
+  top:37.5%;
+  width:25%;
+  height:25%;
+  border:3px solid var(--line);
+  background:
+    linear-gradient(to right, transparent calc(50% - 1.5px), #141414 calc(50% - 1.5px), #141414 calc(50% + 1.5px), transparent calc(50% + 1.5px)),
+    linear-gradient(to bottom, transparent calc(50% - 1.5px), #141414 calc(50% - 1.5px), #141414 calc(50% + 1.5px), transparent calc(50% + 1.5px)),
+    linear-gradient(135deg, #ffcf52, #ff8e3c);
+  opacity:0;
+  transform:scale(.72) rotate(-2deg);
+  transform-origin:center;
+  transition:opacity .16s ease, transform .18s ease;
+  box-shadow:inset 3px 3px 0 rgba(255,255,255,.42), inset -3px -3px 0 rgba(0,0,0,.26), 5px 5px 0 rgba(22,22,22,.25);
+}
+.poly-link:hover .poly-cover,
+.poly-link:focus-visible .poly-cover{opacity:1;transform:scale(1)}
+.poly-label{display:none}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;flex-wrap:wrap;margin-bottom:16px}
+.section-head h2{margin:0;font-size:clamp(34px,5vw,62px);line-height:.9;letter-spacing:-.075em}
+.section-head p{max-width:650px;color:var(--soft);margin:0;line-height:1.5}
+.cards{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.section-head + .cards{margin-top:8px}
+#projects .cards{margin-top:14px}
+.card{background:var(--panel);color:var(--ink);border:3px solid var(--panel);box-shadow:var(--shadow);padding:20px;min-height:210px;position:relative;overflow:hidden;text-decoration:none}
+.card::after{content:none}
+.card h3,.card p,.card .tag{position:relative;z-index:2}
+.wide{grid-column:span 7}.mid{grid-column:span 5}.small{grid-column:span 4}.half{grid-column:span 6}
+.tag{display:inline-block;background:var(--green);border:2px solid var(--line);padding:6px 8px;font-weight:950;font-size:12px;margin-bottom:12px}
+.card h3{margin:0 0 10px;font-size:27px;letter-spacing:-.055em;line-height:1}
+.card p{margin:0;color:#3f3933;line-height:1.55}.card.red .tag{background:#ff6b57}.card.orange .tag{background:var(--orange)}.card.green .tag{background:var(--green)}.card.blue .tag{background:var(--blue)}.card.pink .tag{background:var(--pink)}.card.purple .tag{background:var(--purple)}
+.project-card{cursor:pointer;transition:transform .18s ease, box-shadow .18s ease, filter .18s ease}
+.project-card:hover,.project-card:focus-visible{transform:translateY(-3px);box-shadow:14px 14px 0 rgba(0,0,0,.34);filter:saturate(1.05) contrast(1.03);outline:3px solid var(--line);outline-offset:4px}
+.blog-list{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.blog-card{background:var(--panel);color:var(--ink);border:3px solid var(--panel);box-shadow:var(--shadow);padding:22px;text-decoration:none;min-height:190px}
+.blog-card time{font-weight:950;color:#645d54;font-size:13px}.blog-card h3{font-size:31px;letter-spacing:-.06em;line-height:1;margin:10px 0}.blog-card p{color:#3f3933;line-height:1.55;margin:0}.blog-card:hover{transform:translateY(-4px)}
+.contact-strip{background:var(--panel);color:var(--ink);border:3px solid var(--panel);box-shadow:var(--shadow);padding:18px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}.contact-strip strong{font-size:24px;letter-spacing:-.05em}.contact-links{display:flex;gap:10px;flex-wrap:wrap}.contact-links a{color:var(--ink);border:2px solid var(--line);padding:9px 11px;text-decoration:none;font-weight:950;background:var(--white)}
+footer{margin:34px clamp(18px,5vw,72px);padding:18px;border:2px solid rgba(243,238,226,.35);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--soft);font-weight:800}
+@media(max-width:1100px){.about{grid-template-columns:1fr}}
+@media(max-width:780px){.duel,.cards,.blog-list{grid-template-columns:1fr}.wide,.mid,.small,.half{grid-column:auto}.profile-card{grid-template-columns:1fr}.profile-card img{max-width:260px}.profile-facts{grid-template-columns:1fr}header{align-items:flex-start;flex-direction:column}.mini{min-height:auto}}
+</style>
+</head>
+<body>
+  <header>
+    <a class="logo" href="#about">harrisonmesh.com</a>
+    <nav aria-label="Main navigation">
+      <a href="#about">about</a>
+      <a href="#experience">experience</a>
+      <a href="#projects">projects</a>
+      <a href="#blog">blog</a>
+      <a class="button primary" href="assets/Harrison_Mesh_Resume.pdf" download>download resume</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="about" class="about">
+      <div>
+        <div class="kicker">math, computer science, and algorithms</div>
+        <h1>All about <span>Harrison Mesh</span></h1>
+        <p class="lead">I am a rising sophomore studying Math and Computer Science at the University of Florida. My work is centered on algorithms, formal methods, and mathematical software. This includes my work at the University of Florida, the Iowa State University Math REU, and Bloomberg.</p>
+        <div class="about-actions">
+          <a class="button primary" href="assets/Harrison_Mesh_Resume.pdf" download>download resume</a>
+          <a class="button" href="mailto:harrisonmesh551@gmail.com">contact me</a>
+          <a class="button" href="https://linkedin.com/in/harrisonmesh/">linkedin</a>
+        </div>
+      </div>
+
+      <aside>
+        <div class="profile-card">
+          <img src="assets/harrison-headshot.jpg" alt="Harrison Mesh" onerror="this.onerror=null;this.src='assets/headshot-placeholder.svg';" />
+          <div>
+            <h2>About me</h2>
+            <p>I enjoy solving problems at the intersection of mathematics and computer science, where clever algorithms let me do things that would be impractical by hand, like tiling a rectangle with polyominoes or building chess engines that can challenge experienced players.</p>
+            <div class="profile-facts" aria-label="Education and honors">
+              <div class="profile-fact"><strong>Education</strong><span>University of Florida · CS + Math</span></div>
+              <div class="profile-fact"><strong>GPA</strong><span>4.0 / 4.0</span></div>
+              <div class="profile-fact"><strong>Honors</strong><span>Honors Program · University Research Scholars Program</span></div>
+              <div class="profile-fact"><strong>Competitions</strong><span>Putnam 21 · SCUDEM Outstanding · M3 Semifinalist · AIME</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="duel" aria-label="Project interactives">
+          <a class="mini chess-link" href="projects/bytechess.html" aria-label="Open ByteChess project page">
+            <h3>ByteChess</h3>
+            <div class="chess-board" aria-label="Chess position. Hover to see 9. Nxg5.">
+                <div class="chess-square light" data-square="a8" aria-label="a8"><span class="piece black-piece">♜</span></div>
+                <div class="chess-square dark" data-square="b8" aria-label="b8"><span class="piece black-piece">♞</span></div>
+                <div class="chess-square light" data-square="c8" aria-label="c8"><span class="piece black-piece">♝</span></div>
+                <div class="chess-square dark" data-square="d8" aria-label="d8"><span class="piece black-piece">♛</span></div>
+                <div class="chess-square light" data-square="e8" aria-label="e8"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="f8" aria-label="f8"><span class="piece black-piece">♜</span></div>
+                <div class="chess-square light" data-square="g8" aria-label="g8"><span class="piece black-piece">♚</span></div>
+                <div class="chess-square dark" data-square="h8" aria-label="h8"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="a7" aria-label="a7"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square light" data-square="b7" aria-label="b7"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square dark" data-square="c7" aria-label="c7"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square light" data-square="d7" aria-label="d7"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="e7" aria-label="e7"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square light" data-square="f7" aria-label="f7"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square dark" data-square="g7" aria-label="g7"><span class="piece black-piece">♝</span></div>
+                <div class="chess-square light" data-square="h7" aria-label="h7"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="a6" aria-label="a6"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="b6" aria-label="b6"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="c6" aria-label="c6"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="d6" aria-label="d6"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square light" data-square="e6" aria-label="e6"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="f6" aria-label="f6"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="g6" aria-label="g6"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="h6" aria-label="h6"><span class="piece black-piece">♟</span></div>
+                <div class="chess-square dark" data-square="a5" aria-label="a5"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="b5" aria-label="b5"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="c5" aria-label="c5"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="d5" aria-label="d5"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="e5" aria-label="e5"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="f5" aria-label="f5"><span class="piece"></span></div>
+                <div class="chess-square dark move-to" data-square="g5" aria-label="g5"><span class="piece before black-piece">♟</span><span class="piece after white-piece">♘</span></div>
+                <div class="chess-square light" data-square="h5" aria-label="h5"><span class="piece black-piece">♞</span></div>
+                <div class="chess-square light" data-square="a4" aria-label="a4"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="b4" aria-label="b4"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="c4" aria-label="c4"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square dark" data-square="d4" aria-label="d4"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square light" data-square="e4" aria-label="e4"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square dark" data-square="f4" aria-label="f4"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="g4" aria-label="g4"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="h4" aria-label="h4"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="a3" aria-label="a3"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="b3" aria-label="b3"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="c3" aria-label="c3"><span class="piece white-piece">♘</span></div>
+                <div class="chess-square light" data-square="d3" aria-label="d3"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="e3" aria-label="e3"><span class="piece"></span></div>
+                <div class="chess-square light move-from" data-square="f3" aria-label="f3"><span class="piece before white-piece">♘</span><span class="piece after"></span></div>
+                <div class="chess-square dark" data-square="g3" aria-label="g3"><span class="piece white-piece">♗</span></div>
+                <div class="chess-square light" data-square="h3" aria-label="h3"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="a2" aria-label="a2"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square dark" data-square="b2" aria-label="b2"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square light" data-square="c2" aria-label="c2"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="d2" aria-label="d2"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="e2" aria-label="e2"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="f2" aria-label="f2"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square light" data-square="g2" aria-label="g2"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square dark" data-square="h2" aria-label="h2"><span class="piece white-piece">♙</span></div>
+                <div class="chess-square dark" data-square="a1" aria-label="a1"><span class="piece white-piece">♖</span></div>
+                <div class="chess-square light" data-square="b1" aria-label="b1"><span class="piece"></span></div>
+                <div class="chess-square dark" data-square="c1" aria-label="c1"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="d1" aria-label="d1"><span class="piece white-piece">♕</span></div>
+                <div class="chess-square dark" data-square="e1" aria-label="e1"><span class="piece white-piece">♔</span></div>
+                <div class="chess-square light" data-square="f1" aria-label="f1"><span class="piece white-piece">♗</span></div>
+                <div class="chess-square dark" data-square="g1" aria-label="g1"><span class="piece"></span></div>
+                <div class="chess-square light" data-square="h1" aria-label="h1"><span class="piece white-piece">♖</span></div>
+                <svg class="move-arrow" viewBox="0 0 100 100" aria-hidden="true">
+                  <defs>
+                    <marker id="arrowhead" markerWidth="4" markerHeight="4" refX="3.4" refY="2" orient="auto">
+                      <path d="M0,0 L0,4 L4,2 z" fill="#ffb13d"></path>
+                    </marker>
+                  </defs>
+                  <line x1="68.75" y1="68.75" x2="81.25" y2="43.75" stroke="#ffb13d" stroke-width="2.25" stroke-linecap="round" marker-end="url(#arrowhead)"></line>
+                </svg>
+            </div>
+            <p>Rust engine · dynamic evaluation · transposition tables · alpha-beta pruning.</p>
+            <span class="cta">open project →</span>
+          </a>
+          <a class="mini poly-link" href="blog/polyominoes.html" aria-label="Open polyomino blog post">
+            <h3>Tiling a rectangle</h3>
+            <div class="poly-wrap" aria-label="8 by 8 polyomino board. Hover to cover the center square.">
+              <img src="assets/polyomino-board.png" alt="Multicolored polyomino tiling on an 8 by 8 board with a central uncovered square" />
+              <span class="poly-cover" aria-hidden="true"></span>
+            </div>
+            <p>Rectangle tiling · exact cover · frontier heuristics · proving impossibility.</p>
+            <span class="cta">read the post →</span>
+          </a>
+        </div>
+      </aside>
+    </section>
+
+    <section id="experience">
+      <div class="section-head">
+        <h2>Experience</h2>
+      </div>
+      <div class="cards">
+        <article class="card wide red" data-label="REU">
+          <span class="tag">Iowa State University · Math REU</span>
+          <h3>Temporal logic and formal methods</h3>
+          <p>Selected for a full-time mathematics REU on temporal logic and formal methods, with work on verifying translations from Mission-time Linear Temporal Logic into propositional logic using Isabelle/HOL.</p>
+        </article>
+        <article class="card mid orange" data-label="BBG">
+          <span class="tag">Bloomberg L.P. · Data Technologies</span>
+          <h3>Financial-document API pipeline</h3>
+          <p>Built an internal API pipeline aggregating document-processing outputs to extract text and image information from financial documents, while contributing workflow feedback in weekly engineering meetings.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="section-head">
+        <h2>Projects</h2>
+      </div>
+      <div class="cards">
+        <a class="card half green project-card" href="projects/bytechess.html" data-label="BC">
+          <span class="tag">ByteChess · Rust</span>
+          <h3>Creating a chess engine</h3>
+          <p>Developed a chess engine using iterative deepening, transposition tables, move ordering, evaluation heuristics, alpha-beta pruning, and null-move pruning; estimated around 2000-2100 Elo.</p>
+        </a>
+        <a class="card half blue project-card" href="projects/leantex.html" data-label="LT">
+          <span class="tag">LeanTeX · C++ / Lean</span>
+          <h3>Making formal proofs human-readable</h3>
+          <p>Work on translating Lean proof structure into an intermediate representation for structured English and LaTeX explanations, starting with propositional logic and designed to scale to richer proof systems.</p>
+        </a>
+      </div>
+    </section>
+
+    <section id="blog">
+      <div class="section-head">
+        <h2>Blog</h2>
+      </div>
+      <div class="blog-list">
+        <a class="blog-card" href="blog/welcome.html">
+          <time>Launch</time>
+          <h3>Welcome to harrisonmesh.com</h3>
+          <p>A short introduction to the site, the project pages, and what I plan to write about.</p>
+        </a>
+        <a class="blog-card" href="blog/polyominoes.html">
+          <time>Math</time>
+          <h3>Rectangle tiling and polyominoes</h3>
+          <p>How shapes built from connected sets of squares can - or cannot - tiling a rectangle.</p>
+        </a>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="contact-strip">
+        <strong>Contact</strong>
+        <div class="contact-links">
+          <a href="mailto:harrisonmesh551@gmail.com">email</a>
+          <a href="https://linkedin.com/in/harrisonmesh/">linkedin</a>
+          <a href="assets/Harrison_Mesh_Resume.pdf" download>resume</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>harrisonmesh.com</span>
+    <span>harrisonmesh551@gmail.com</span>
+    <span>linkedin.com/in/harrisonmesh</span>
+  </footer>
+</body>
+</html>
